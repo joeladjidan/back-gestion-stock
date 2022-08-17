@@ -4,14 +4,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.2</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+		<artifactId>back-multi-module</artifactId>
+		<groupId>com.joeladjidan</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+    </parent>
 	<groupId>com.joeladjidan</groupId>
 	<artifactId>back-gestion-stock</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 	<name>back-gestion-stock</name>
 	<description>API de gestion de stock</description>
 	<properties>
@@ -97,46 +96,6 @@
 						</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.github.kongchen</groupId>
-				<artifactId>swagger-maven-plugin</artifactId>
-				<version>3.1.8</version>
-				<configuration>
-					<apiSources>
-						<apiSource>
-							<springmvc>true</springmvc>
-							<locations>
-								<location>com.joeladjidan.gestiondestock.controller.api</location>
-							</locations>
-							<basePath>http://localhost:8081</basePath>
-							<info>
-								<title>Swagger Api Documentation for Gestion de stock
-									application</title>
-								<version>${project.version}</version>
-								<description>Swagger Api documentation for Gestion de stock
-									application</description>
-								<contact>
-									<email>joeladjidan@gmail.com</email>
-									<name>Adjidan joel</name>
-									<url>https://www.udemy.com/user/bouali-ali/</url>
-								</contact>
-							</info>
-							<outputPath>${project.build.directory}</outputPath>
-							<outputFormats>json</outputFormats>
-							<swaggerApiReader>com.github.kongchen.swagger.docgen.reader.SpringMvcApiReader</swaggerApiReader>
-							<swaggerDirectory>${project.build.directory}</swaggerDirectory>
-						</apiSource>
-					</apiSources>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
