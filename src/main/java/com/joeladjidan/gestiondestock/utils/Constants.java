@@ -20,4 +20,9 @@ public interface Constants {
   String VENTES_ENDPOINT = APP_ROOT + "/ventes";
 
   String AUTHENTICATION_ENDPOINT = APP_ROOT + "/auth";
+
+  public static final String AUTHORIZATION_HEADER = "Authorization";
+
+  public static final String REFRESH_HEADER = "RefreshToken";
+
 }

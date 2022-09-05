@@ -26,28 +26,30 @@ import com.joeladjidan.gestiondestock.repository.UtilisateurRepository;
 @EnableJpaAuditing
 public class ApiGestionDeStockApplication {
 
+	// https://javainfinite.com/springsecurity/spring-boot-security-with-jwt-example-token-generate-validate-and-refresh/
+
   public static void main(String[] args) {
     SpringApplication.run(ApiGestionDeStockApplication.class, args);
   }
-  
+
   @Component
   class DBInitCommandLineRunner implements CommandLineRunner{
 
   	@Autowired
   	private UtilisateurRepository utilisateurRepository;
-  	
+
   	@Autowired
   	private EntrepriseRepository entrepriseRepository;
-  	
+
 	@Autowired
   	private ClientRepository clientRepository;
-	
+
 	@Autowired
   	private RolesRepository roleRepository;
-	
+
 	@Autowired
   	private CategoryRepository categoryRepository;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -56,23 +58,23 @@ public class ApiGestionDeStockApplication {
   	public void run(String... args) throws Exception {
   		Entreprise entrepriseRs = null;
   		Utilisateur utilisateurRs = null;
-  		
+
   		Adresse adresse = new Adresse();
   		adresse.setPays("FRANCE");
   		adresse.setCodePostale("94400");
   		adresse.setAdresse1("67 Avenue Jean Jaures");
   		adresse.setVille("VITRY-SUR-SEINE");
-  		
+
   		Category category = new Category();
   		category.setId(1);
   		category.setIdEntreprise(1);
   		category.setCode("A123456");
   		category.setLastModifiedDate(new Date().toInstant());
   		category.setCreationDate(new Date().toInstant());
-  	
+
   		if(categoryRepository.findAll().isEmpty())
   		   categoryRepository.save(category);
-  		
+
   		Client client = new Client();
   		client.setId(1);
   		client.setAdresse(adresse);
@@ -82,10 +84,10 @@ public class ApiGestionDeStockApplication {
   		client.setMail("joeladjidan@gmail.com");
   		client.setLastModifiedDate(new Date().toInstant());
   		client.setCreationDate(new Date().toInstant());
-  		
+
   		if(clientRepository.findAll().isEmpty())
   		   clientRepository.save(client);
-  		
+
   		Entreprise entreprise = new Entreprise();
   		entreprise.setNom("ANSGROUP");
   		entreprise.setAdresse(adresse);
@@ -94,11 +96,11 @@ public class ApiGestionDeStockApplication {
   		entreprise.setEmail("ansgroup@gmail.com");
   		entreprise.setCreationDate(new Date().toInstant());
   		entreprise.setLastModifiedDate(new Date().toInstant());
-  		
+
   		if(entrepriseRepository.findAll().isEmpty()) {
   			entrepriseRs = entrepriseRepository.save(entreprise);
   		}
-  			
+
 
   		Utilisateur utulisateur = new Utilisateur();
   		utulisateur.setLastModifiedDate(new Date().toInstant());
@@ -110,19 +112,19 @@ public class ApiGestionDeStockApplication {
   		utulisateur.setAdresse(adresse);
   		utulisateur.setEntreprise(entrepriseRs);
   		utulisateur.setMoteDePasse(passwordEncoder.encode("Ines26031986*"));
-  		
+
   		if(utilisateurRepository.findAll().isEmpty())
   		   utilisateurRs = utilisateurRepository.save(utulisateur);
-  		
+
   		Roles role = new Roles();
   		role.setRoleName("ADMIN");
   		role.setUtilisateur(utilisateurRs);
   		role.setCreationDate(new Date().toInstant());
   		role.setLastModifiedDate(new Date().toInstant());
-  		
+
   		if(roleRepository.findAll().isEmpty())
-  		   roleRepository.save(role);	
-  		
+  		   roleRepository.save(role);
+
   	}
   }
 }

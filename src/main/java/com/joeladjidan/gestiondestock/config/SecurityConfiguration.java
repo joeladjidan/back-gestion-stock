@@ -20,16 +20,18 @@ import org.springframework.web.filter.CorsFilter;
 
 import com.joeladjidan.gestiondestock.services.auth.ApplicationUserDetailsService;
 
-@EnableWebSecurity
+@EnableWebSecurity(debug = false)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-	
+
 	// npm install --save --legacy-peer-deps
 
   @Autowired
   private ApplicationUserDetailsService applicationUserDetailsService;
 
   @Autowired
-  private ApplicationRequestFilter applicationRequestFilter;
+  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+  @Autowired private JwtAuthentificationFilter jwtAuthentificationFilter;
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -38,12 +40,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.addFilterBefore(corsFilter(), SessionManagementFilter.class)
-        .csrf().disable()
+        http.csrf().disable()
         .authorizeRequests()
         .antMatchers("/**/authenticate",
         "/**/entreprises/create",
-        "/**/utilisateurs",
+        "/**/utilisateurs/**",
         "/**/clients",
         "/v2/api-docs",
         "/swagger-resources",
@@ -55,10 +56,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/v3/api-docs/**",
         "/swagger-ui/**").permitAll()
         .anyRequest().authenticated()
-        .and().sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-    http.addFilterBefore(applicationRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        .and()
+        .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
   }
 
   // Used by spring security if CORS is enabled.
@@ -69,7 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     config.setAllowCredentials(true);
     // Don't do this in production, use a proper list  of allowed origins
     config.setAllowedOriginPatterns(Collections.singletonList("*"));
-    config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
+    config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "RefreshToken"));
     config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
     source.registerCorsConfiguration("/**", config);
     return new CorsFilter(source);

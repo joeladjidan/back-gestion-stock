@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -24,21 +22,28 @@ public class SwaggerConfiguration {
   @Bean
   public Docket api() {
     return new Docket(DocumentationType.SWAGGER_2)
-        .apiInfo(
-            new ApiInfoBuilder()
-                .description("Gestion de stock API documentation")
-                .title("Gestion de stock REST API")
-                .build()
-        )
         .groupName("REST API V1")
         .securityContexts(Collections.singletonList(securityContext()))
         .securitySchemes(Collections.singletonList(apiKey()))
         .useDefaultResponseMessages(false)
         .select()
-        .apis(RequestHandlerSelectors.basePackage("com.joeladjidan.gestiondestock"))
+    //    .apis(RequestHandlerSelectors.basePackage("com.joeladjidan.gestiondestock"))
+        .apis(RequestHandlerSelectors.any())
         .paths(PathSelectors.any())
-        .build();
+        .build()
+        .apiInfo(apiInfo());
   }
+
+
+    private ApiInfo apiInfo() {
+        return new ApiInfo(
+                "My REST API", //title
+                "Some custom description of API.", //description
+                "Version 1.0", //version
+                "Terms of service", //terms of service URL
+                new Contact("Joel ADJIDAN", "xxxxxxxxxxxx", "joeladjidan@gmail.com"),
+                "License of API", "API license URL", Collections.emptyList());
+    }
 
   private ApiKey apiKey() {
     return new ApiKey("JWT", AUTHORIZATION_HEADER, "header");
