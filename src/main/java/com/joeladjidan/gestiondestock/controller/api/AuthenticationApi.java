@@ -1,9 +1,7 @@
 package com.joeladjidan.gestiondestock.controller.api;
 
 import io.swagger.annotations.Api;
-
 import static com.joeladjidan.gestiondestock.utils.Constants.AUTHENTICATION_ENDPOINT;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public interface AuthenticationApi {
 
   @PostMapping(AUTHENTICATION_ENDPOINT + "/authenticate")
-  @ResponseStatus(code = HttpStatus.OK, reason = "OK")
   ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) throws Exception;
 
 }

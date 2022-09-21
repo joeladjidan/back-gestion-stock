@@ -27,8 +27,7 @@ flickr:
 jwt:
   header: Authorization
   secret: secret
-  expiration: 600004800
-  expirationDateInMs: 0
+  jwtExpirationInMs: 18000000
   refreshExpirationDateInMs: 600000000
   route:
     authentication:

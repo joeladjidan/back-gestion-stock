@@ -26,4 +26,12 @@ public class ErrorDto {
 
   private List<String> errors = new ArrayList<>();
 
+    public ErrorDto(Integer httpCode , String message) {
+        this.httpCode = httpCode;
+        this.message = message;
+    }
+
+    public ErrorDto(String message) {
+        this.message = message;
+    }
 }

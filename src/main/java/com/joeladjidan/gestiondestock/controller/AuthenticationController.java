@@ -26,10 +26,10 @@ import java.util.Objects;
 public class AuthenticationController implements AuthenticationApi {
 
   @Autowired
-  private AuthenticationManager authenticationManager;
+  private ApplicationUserDetailsService userDetailsService;
 
   @Autowired
-  private ApplicationUserDetailsService userDetailsService;
+  private AuthenticationManager authenticationManager;
 
   @Autowired
   private JwtUtil jwtUtil;
@@ -51,17 +51,18 @@ public class AuthenticationController implements AuthenticationApi {
     log.info("AuthenticationResponse is password {}", request.getPassword());
 
     return ResponseEntity.ok(AuthenticationResponse.builder().accessToken(jwt).build());
+
   }
 
   private void authenticate(String username, String password) throws Exception {
-    Objects.requireNonNull(username);
-    Objects.requireNonNull(password);
-    try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-    } catch (DisabledException e) {
-      throw new Exception("USER_DISABLED", e);
-    } catch (BadCredentialsException e) {
-      throw new Exception("INVALID_CREDENTIALS", e);
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
+        try {
+          authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {
+          throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+          throw new Exception("INVALID_CREDENTIALS", e);
+        }
     }
-  }
 }

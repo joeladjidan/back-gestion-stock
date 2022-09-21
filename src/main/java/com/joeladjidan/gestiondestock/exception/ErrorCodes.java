@@ -48,11 +48,11 @@ public enum ErrorCodes {
   VENTE_NOT_FOUND(13000),
   VENTE_NOT_VALID(13001),
   VENTE_ALREADY_IN_USE(13002),
+  TOKEN_EXPIRED(403),
 
   // Liste des exception techniaues
   UPDATE_PHOTO_EXCEPTION(14000),
-  UNKNOWN_CONTEXT(14001)
-  ;
+  UNKNOWN_CONTEXT(14001);
 
   private int code;
 

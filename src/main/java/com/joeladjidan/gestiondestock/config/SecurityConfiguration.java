@@ -3,6 +3,7 @@ package com.joeladjidan.gestiondestock.config;
 import java.util.Arrays;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,8 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -24,12 +25,14 @@ import com.joeladjidan.gestiondestock.services.auth.ApplicationUserDetailsServic
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	// npm install --save --legacy-peer-deps
+  //  http://localhost:8081/swagger-ui/index.html
 
   @Autowired
   private ApplicationUserDetailsService applicationUserDetailsService;
 
   @Autowired
-  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  @Qualifier("jwtAuthenticationEntryPoint")
+  AuthenticationEntryPoint authenticationEntryPoint;
 
   @Autowired private JwtAuthentificationFilter jwtAuthentificationFilter;
 
@@ -38,33 +41,40 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       auth.userDetailsService(applicationUserDetailsService).passwordEncoder(passwordEncoder());
   }
 
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-        .authorizeRequests()
-        .antMatchers("/**/authenticate",
-        "/**/entreprises/create",
-        "/**/utilisateurs/**",
-        "/**/clients",
-        "/v2/api-docs",
-        "/swagger-resources",
-        "/swagger-resources/**",
-        "/configuration/ui",
-        "/configuration/security",
-        "/swagger-ui.html",
-        "/webjars/**",
-        "/v3/api-docs/**",
-        "/swagger-ui/**").permitAll()
-        .anyRequest().authenticated()
-        .and()
-        .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
-  }
+    // Set session management to stateless
+    http = http.addFilter(corsFilter()).csrf().disable()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .and();
 
-  // Used by spring security if CORS is enabled.
+    // Set permissions on endpoints
+    http.authorizeRequests()
+    .antMatchers("/**/authenticate/**",
+            "/**/entreprises/create",
+            "/**/utilisateurs/**",
+            "/**/clients",
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**").permitAll()
+            .anyRequest().authenticated();
+
+    // Add JWT token filter
+    http.addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
+}
+
+// Used by spring security if CORS is enabled.
   @Bean
   public CorsFilter corsFilter() {
     final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

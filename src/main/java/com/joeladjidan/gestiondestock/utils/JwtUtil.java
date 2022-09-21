@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import com.joeladjidan.gestiondestock.model.auth.ExtendedUser;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -18,22 +19,16 @@ public class JwtUtil {
 
 	private String secret;
 	private int jwtExpirationInMs;
-    private int refreshExpirationDateInMs;
 
 	@Value("${jwt.secret}")
 	public void setSecret(String secret) {
 		this.secret = secret;
 	}
 
-	@Value("${jwt.expirationDateInMs}")
+	@Value("${jwt.jwtExpirationInMs}")
 	public void setJwtExpirationInMs(int jwtExpirationInMs) {
 		this.jwtExpirationInMs = jwtExpirationInMs;
 	}
-
-    @Value("${jwt.refreshExpirationDateInMs}")
-    public void setRefreshExpirationDateInMs(int refreshExpirationDateInMs) {
-        this.refreshExpirationDateInMs = refreshExpirationDateInMs;
-    }
 
 	public String extractUsername(String token ) {
 		return extractClaim(token, Claims::getSubject);
@@ -90,9 +85,14 @@ public class JwtUtil {
 	}
 
 
-	public Boolean validateToken(String token) {
+	public Boolean validateToken8(String token) {
 		final String username = extractUsername(token);
 		return username != null && !isTokenExpired(token);
+	}
+
+	public Boolean validateToken(String token, UserDetails userDetails) {
+		final String username = extractUsername(token);
+		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 
 }

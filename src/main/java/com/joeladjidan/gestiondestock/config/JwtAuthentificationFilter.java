@@ -1,13 +1,19 @@
 package com.joeladjidan.gestiondestock.config;
 
-import com.joeladjidan.gestiondestock.exception.EntityNotFoundException;
+import com.joeladjidan.gestiondestock.exception.*;
+import com.joeladjidan.gestiondestock.handlers.ErrorDto;
 import com.joeladjidan.gestiondestock.services.auth.ApplicationUserDetailsService;
 import com.joeladjidan.gestiondestock.utils.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -17,7 +23,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,39 +46,24 @@ public class JwtAuthentificationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         final Optional<String> jwt = getJwtFromRequest(request);
         jwt.ifPresent(token -> {
             try {
-                if (jwtUtilService.validateToken(token)) {
+                idEntreprise = jwtUtilService.extractIdEntreprise(token);
+                if (jwtUtilService.validateToken8(token)) {
                     setSecurityContext(new WebAuthenticationDetailsSource().buildDetails(request), token);
                 }
-            } catch (IllegalArgumentException | JwtException e) {
+            } catch (IllegalArgumentException | JwtException | AccessDeniedException e) {
                 logger.error("Unable to get JWT Token or JWT Token has expired");
-                SecurityContextHolder.clearContext();
-                // most likely an ExpiredJwtException, but this will handle any
-                request.setAttribute("exception", e);
-                request.setAttribute("expired-jwt", e);
-                RequestDispatcher dispatcher = request.getRequestDispatcher("expired-jwt");
-                try {
-                   dispatcher.forward(request, response);
-                   throw new EntityNotFoundException("" + e.getMessage());
-                } catch (ServletException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                logger.error("Can NOT set user authentication -> Message: {}", e);
             }
         });
-
         MDC.put("idEntreprise", idEntreprise);
         filterChain.doFilter(request, response);
-
     }
 
     private void setSecurityContext(WebAuthenticationDetails authDetails, String token) {
         final String username = jwtUtilService.extractUsername(token);
-        idEntreprise = jwtUtilService.extractIdEntreprise(token);
         final UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
         final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
                 userDetails.getAuthorities());

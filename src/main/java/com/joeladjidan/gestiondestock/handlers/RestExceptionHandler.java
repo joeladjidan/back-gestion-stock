@@ -1,6 +1,7 @@
 package com.joeladjidan.gestiondestock.handlers;
 
 import java.util.Collections;
+import com.joeladjidan.gestiondestock.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,10 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.joeladjidan.gestiondestock.exception.EntityNotFoundException;
-import com.joeladjidan.gestiondestock.exception.ErrorCodes;
-import com.joeladjidan.gestiondestock.exception.InvalidEntityException;
-import com.joeladjidan.gestiondestock.exception.InvalidOperationException;
 
 
 @RestControllerAdvice
@@ -23,10 +20,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     final HttpStatus notFound = HttpStatus.NOT_FOUND;
     final ErrorDto errorDto = ErrorDto.builder()
-        .code(exception.getErrorCode())
-        .httpCode(notFound.value())
-        .message(exception.getMessage())
-        .build();
+            .code(exception.getErrorCode())
+            .httpCode(notFound.value())
+            .message(exception.getMessage())
+            .build();
 
     return new ResponseEntity<>(errorDto, notFound);
   }
@@ -36,10 +33,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     final HttpStatus notFound = HttpStatus.BAD_REQUEST;
     final ErrorDto errorDto = ErrorDto.builder()
-        .code(exception.getErrorCode())
-        .httpCode(notFound.value())
-        .message(exception.getMessage())
-        .build();
+            .code(exception.getErrorCode())
+            .httpCode(notFound.value())
+            .message(exception.getMessage())
+            .build();
 
     return new ResponseEntity<>(errorDto, notFound);
   }
@@ -49,11 +46,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 
     final ErrorDto errorDto = ErrorDto.builder()
-        .code(exception.getErrorCode())
-        .httpCode(badRequest.value())
-        .message(exception.getMessage())
-        .errors(exception.getErrors())
-        .build();
+            .code(exception.getErrorCode())
+            .httpCode(badRequest.value())
+            .message(exception.getMessage())
+            .errors(exception.getErrors())
+            .build();
 
     return new ResponseEntity<>(errorDto, badRequest);
   }
@@ -63,13 +60,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 
     final ErrorDto errorDto = ErrorDto.builder()
-        .code(ErrorCodes.BAD_CREDENTIALS)
-        .httpCode(badRequest.value())
-        .message(exception.getMessage())
-        .errors(Collections.singletonList("Login et / ou mot de passe incorrecte"))
-        .build();
+            .code(ErrorCodes.BAD_CREDENTIALS)
+            .httpCode(badRequest.value())
+            .message(exception.getMessage())
+            .errors(Collections.singletonList("Login et / ou mot de passe incorrecte"))
+            .build();
 
     return new ResponseEntity<>(errorDto, badRequest);
   }
-
 }
